@@ -13,3 +13,7 @@ body {
   max-width: 500px;
   margin: 16px;
 }
+
+#loading {
+  height: 40px;
+}

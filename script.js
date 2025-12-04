@@ -10,21 +10,26 @@ async function buscarCEP(event) {
 
   const input = document.getElementById('cep');
   const resultado = document.getElementById('resultado');
+  const loading = document.getElementById('loading');
+  const btn = document.getElementById('btnBuscar');
 
   const cep = (input.value || '').replace(/\D/g, '');
 
-  resultado.innerHTML = ''; 
+  resultado.innerHTML = '';
+  loading.style.display = 'none';
 
   if (cep.length !== 8) {
     resultado.innerHTML = '<div class="alert alert-danger">CEP inválido! Digite 8 números.</div>';
     return;
   }
 
-  btnState(true);
+  btn.disabled = true;
+  btn.textContent = 'Buscando...';
+  loading.style.display = 'block';
 
   try {
     const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-    if (!response.ok) throw new Error('Erro na requisição');
+    if (!response.ok) throw new Error();
 
     const data = await response.json();
 
@@ -46,23 +51,20 @@ async function buscarCEP(event) {
     `;
 
     const limparBtn = document.getElementById('limparBtn');
-    limparBtn?.addEventListener('click', () => {
-      document.getElementById('cep').value = '';
+    limparBtn.addEventListener('click', () => {
+      input.value = '';
       resultado.innerHTML = '';
-      document.getElementById('cep').focus();
+      loading.style.display = 'none';
+      btn.disabled = false;
+      btn.textContent = 'Buscar';
+      input.focus();
     });
 
   } catch (err) {
-    console.error(err);
     resultado.innerHTML = '<div class="alert alert-danger">Erro ao consultar o CEP. Tente novamente.</div>';
   } finally {
-    btnState(false);
-  }
-
-  function btnState(disabled) {
-    const btn = document.getElementById('btnBuscar');
-    if (!btn) return;
-    btn.disabled = !!disabled;
-    btn.textContent = disabled ? 'Buscando...' : 'Buscar';
+    loading.style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = 'Buscar';
   }
 }
